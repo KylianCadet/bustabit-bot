@@ -10,9 +10,9 @@ class Bustabit:
     _browser = None
     _error = False
 
-    def __init__(self):
+    def __init__(self, firefox_folder):
         # Launch Firefox GUI
-        self._browser = webdriver.Firefox("./firefox_profile")
+        self._browser = webdriver.Firefox(firefox_folder)
 
         # Catch SIGINT to close browser before exiting
         def signal_handler(signal, frame):
@@ -94,7 +94,13 @@ class Bustabit:
         return
 
 
+def print_usage():
+    print("python3 bot.py [firefox_folder]")
+
 if __name__ == "__main__":
-    bot = Bustabit()
+    if len(sys.argv) != 2:
+        print_usage()
+        exit(0)
+    bot = Bustabit(sys.argv[1])
     bot.start()
     exit(0)
