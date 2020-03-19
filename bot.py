@@ -10,9 +10,9 @@ class Bustabit:
     _browser = None
     _error = False
 
-    def __init__(self, firefox_folder):
+    def __init__(self, firefox_profile):
         # Launch Firefox GUI
-        self._browser = webdriver.Firefox(firefox_folder)
+        self._browser = webdriver.Firefox(firefox_profile=firefox_profile, firefox_binary="./firefox/firefox", executable_path="./firefox/geckodriver")
 
         # Catch SIGINT to close browser before exiting
         def signal_handler(signal, frame):
