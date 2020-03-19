@@ -12,7 +12,7 @@ class Bustabit:
     _script_name = None
     _error = False
 
-    def __init__(self, firefox_profile, script_name):
+    def __init__(self, firefox_profile, script_name = None):
         # Launch Firefox GUI
         self._browser = webdriver.Firefox(firefox_profile=firefox_profile, firefox_binary="./firefox/firefox", executable_path="./firefox/geckodriver")
         self._script_name = script_name
@@ -54,6 +54,30 @@ class Bustabit:
             self._error = True
         return
 
+    def _load_script(self):
+        # Get and click on 'New' button
+        edit_flatbet_script = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-info']")
+        edit_flatbet_script.click()
+
+        # Paste your script in the textarea
+        script_textarea = self._browser.find_element_by_xpath("//textarea[@class='form-control']")
+        script_textarea.click()
+        script_textarea.send_keys(Keys.CONTROL, 'a')
+        print('Reading "' + self._script_name + '", this may take several seconds')
+        try:
+            file = open(self._script_name, "r")
+        except:
+            sys.stderr.write("No such file : " + self._script_name + "\n")
+            exit(84)
+        script_textarea.send_keys(file.read())
+        print('Script saved')
+        file.close()
+
+        # Get and click on 'Create' button
+        create_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-success']")
+        create_script_button.click()
+
+
     def _auto_bet(self):
         """Starting auto bet with flat bet strategie in simulated mode"""
 
@@ -61,26 +85,11 @@ class Bustabit:
         auto_button = self._browser.find_element_by_xpath("//li[@class='' and @role='presentation']/a[@role='button' and @href='#']")
         auto_button.click()
 
-        # Get and click on 'New' button
-        edit_flatbet_script = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-info']")
-        edit_flatbet_script.click()
+        if self._script_name is not None:
+            self._load_script()
 
-        # Paste your script in the textarea
-        f = open(self._script_name, "r")
-        script_textarea = self._browser.find_element_by_xpath("//textarea[@class='form-control']")
-        script_textarea.click()
-        script_textarea.send_keys(Keys.CONTROL, 'a')
-        print('Reading "' + self._script_name + '", this may take several seconds')
-        script_textarea.send_keys(f.read())
-        print('Script saved')
-        f.close()
-
-        # Get and click on 'Create' button
-        create_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-success']")
-        create_script_button.click()
-
-        # Get and click on 'New script' arrow button
-        my_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-default'][last()]")
+        # Get and click on the first script arrow button
+        my_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-default']")
         my_script_button.click()
 
         # Get and click on 'Simulation' checkbox
@@ -125,6 +134,9 @@ if __name__ == "__main__":
     if "-h" in sys.argv or len(sys.argv) < 2 or len(sys.argv) > 3:
         print_usage()
         exit(0)
-    bot = Bustabit(sys.argv[1], sys.argv[2])
+    if len(sys.argv) == 2:
+        bot = Bustabit(sys.argv[1])
+    if len(sys.argv) == 3:
+        bot = Bustabit(sys.argv[1], sys.argv[2])
     bot.start()
     exit(0)
