@@ -10,6 +10,7 @@ import sys
 class Bustabit:
     _browser = None
     _script_name = None
+    _wager = None
     _error = False
 
     def __init__(self, firefox_profile, script_name = None):
@@ -55,6 +56,7 @@ class Bustabit:
         return
 
     def _load_script(self):
+
         # Get and click on 'New' button
         edit_flatbet_script = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-info']")
         edit_flatbet_script.click()
@@ -77,6 +79,34 @@ class Bustabit:
         create_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-success']")
         create_script_button.click()
 
+    def _fill_config(self):
+
+        # Ask user and fill wager field
+        wager_input = self._browser.find_element_by_css_selector(".form-group:nth-child(1) > .input-group > .form-control")
+        # wager_input = self._browser.find_elements_by_xpath("//span[@class='input-group']/span[contains(text(), 'wager')]/following-sibling::input")
+        wager_input.click()
+        wager_input.send_keys(Keys.CONTROL, 'a')
+        wager_input.send_keys(Keys.BACKSPACE)
+        print("How much do you want to wager?")
+        self._wager = input()
+        while self._wager is None or isNumber(self._wager) is False or float(self._wager) < 1 or float(self._wager) > 1000:
+            print("Please try again:")
+            self._wager = input()
+        self._wager = round(float(self._wager))
+        wager_input.send_keys(str(self._wager))
+
+        # Ask user and fill payout field
+        payout_input = self._browser.find_element_by_css_selector(".form-group:nth-child(2) > .input-group > .form-control")
+        # wager_input = self._browser.find_elements_by_xpath("//span[@class='input-group']/span[contains(text(), 'wager')]/following-sibling::input")
+        payout_input.click()
+        payout_input.send_keys(Keys.CONTROL, 'a')
+        payout_input.send_keys(Keys.BACKSPACE)
+        print("How much do you want to set the payout?")
+        self._wager = input()
+        while self._wager is None or isNumber(self._wager) is False or float(self._wager) < 1 or float(self._wager) > 1000:
+            print("Please try again:")
+            self._wager = input()
+        payout_input.send_keys(str(self._wager))
 
     def _auto_bet(self):
         """Starting auto bet with flat bet strategie in simulated mode"""
@@ -91,6 +121,8 @@ class Bustabit:
         # Get and click on the first script arrow button
         my_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-default']")
         my_script_button.click()
+
+        self._fill_config()
 
         # Get and click on 'Simulation' checkbox
         simulation_button = self._browser.find_element_by_xpath("//div[@class='checkbox simCheckbox']/label/input[@type='checkbox']")
@@ -126,6 +158,13 @@ class Bustabit:
         self._run()
         return
 
+def isNumber(nb):
+    try:
+        float(nb)
+    except:
+        sys.stderr.write("Error: '" + str(nb) + "' is not a number\n")
+        return False
+    return True
 
 def print_usage():
     print("python3 bot.py firefox_folder [script]")
