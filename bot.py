@@ -122,7 +122,7 @@ def print_usage():
     print("python3 bot.py firefox_folder [script]")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
+    if "-h" in sys.argv or len(sys.argv) < 2 or len(sys.argv) > 3:
         print_usage()
         exit(0)
     bot = Bustabit(sys.argv[1], sys.argv[2])
