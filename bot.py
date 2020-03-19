@@ -2,17 +2,20 @@ import time
 import signal
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import sys
 
 class Bustabit:
     _browser = None
+    _script_name = None
     _error = False
 
-    def __init__(self, firefox_profile):
+    def __init__(self, firefox_profile, script_name):
         # Launch Firefox GUI
         self._browser = webdriver.Firefox(firefox_profile=firefox_profile, firefox_binary="./firefox/firefox", executable_path="./firefox/geckodriver")
+        self._script_name = script_name
 
         # Catch SIGINT to close browser before exiting
         def signal_handler(signal, frame):
@@ -58,9 +61,27 @@ class Bustabit:
         auto_button = self._browser.find_element_by_xpath("//li[@class='' and @role='presentation']/a[@role='button' and @href='#']")
         auto_button.click()
 
-        # Get and click on 'Flat bet' arrow button
-        flat_bet_button = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-default']")
-        flat_bet_button.click()
+        # Get and click on 'New' button
+        edit_flatbet_script = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-info']")
+        edit_flatbet_script.click()
+
+        # Paste your script in the textarea
+        f = open(self._script_name, "r")
+        script_textarea = self._browser.find_element_by_xpath("//textarea[@class='form-control']")
+        script_textarea.click()
+        script_textarea.send_keys(Keys.CONTROL, 'a')
+        print('Reading "' + self._script_name + '", this may take several seconds')
+        script_textarea.send_keys(f.read())
+        print('Script saved')
+        f.close()
+
+        # Get and click on 'Create' button
+        create_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-success']")
+        create_script_button.click()
+
+        # Get and click on 'New script' arrow button
+        my_script_button = self._browser.find_element_by_xpath("//button[@class='btn btn-xs btn-default'][last()]")
+        my_script_button.click()
 
         # Get and click on 'Simulation' checkbox
         simulation_button = self._browser.find_element_by_xpath("//div[@class='checkbox simCheckbox']/label/input[@type='checkbox']")
@@ -84,23 +105,26 @@ class Bustabit:
 
     def start(self):
         """Start the Bustabit bot"""
+        print("Bustabit bot starting...")
         self._connect()
         if (self._error):
             print('Are you sure you are logged with your profile ?')
             self._browser.quit()
             return
+        print("Browser ready")
         self._auto_bet()
+        print('Script starting...')
         self._run()
         return
 
 
 def print_usage():
-    print("python3 bot.py [firefox_folder]")
+    print("python3 bot.py firefox_folder [script]")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
         print_usage()
         exit(0)
-    bot = Bustabit(sys.argv[1])
+    bot = Bustabit(sys.argv[1], sys.argv[2])
     bot.start()
     exit(0)
