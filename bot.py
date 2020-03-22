@@ -24,7 +24,7 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         # Modify log container height to get more log
-        self.server.webdriver.execute_script("document.getElementsByClassName('logListContainer')[0].style.height = '400px'")
+        self.server.webdriver.execute_script("document.getElementsByClassName('logListContainer')[0].style.height = '400px'") # modify the height to have more log
         log = self.server.webdriver.find_element_by_xpath("//div[@class='ReactVirtualized__Grid__innerScrollContainer']").text
 
         # Open profile screen
@@ -45,10 +45,7 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
 
         # Close profile screen
         self.server.webdriver.find_element_by_xpath("//button[@class='close']").click()
-        a = ''
-        for key, val in os.environ.items():
-            a += key + ' : ' + val + '\n'
-        msg = a + '\n' + 'Username : ' + username + '\nProfit : ' + game_profit + '\nBalance : ' + balance + '\n\n' + log
+        msg = 'Username : ' + username + '\nProfit : ' + game_profit + '\nBalance : ' + balance + '\n\n' + log
         self.wfile.write(bytes(msg, 'utf-8'))
 
 
