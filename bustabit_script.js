@@ -1,6 +1,3 @@
-// This is the Flat bet script from the bustabit site
-// Replace this file by your own bot
-
 var config = {
   wager: {
     value: 100, type: 'balance', label: 'wager'
@@ -8,6 +5,10 @@ var config = {
   payout: {
     value: 2, type: 'multiplier', label: 'payout' }
 };
+
+// This is the Flat bet script from the bustabit site
+// Replace this file by your own bot
+// Script files must begin with 'var config = {}'
 
 // Try to bet immediately when script starts
 if (engine.gameState === "GAME_STARTING") {
