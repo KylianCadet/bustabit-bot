@@ -1,22 +1,36 @@
 # Bustabit Bot
 
-Bustabit Bot is a solution to run the bustabit game (https://www.bustabit.com/) without using a web browser directly
+This project aims to use a free Heroku webserver (https://www.heroku.com/) to run the bustabit game (https://www.bustabit.com/) 24/7
 
 ### How it works
 
 > Bustabit does not offer an API to work with, the best workaround is to simulate a web browser activty.
 >*Selenium* (https://www.selenium.dev/) is a powerfull api to automates browser activty.
 
-We are simulating the creation of a new bot in the bustabit format (https://github.com/bustabit/autobet) and we launch it.
+Bustabit bot is simulating the creation of an autobet script and launch it.
 
-### How to setup (Only Firefox)
+### How to setup
 
-  - Loggin to Bustabit with your Firefox account
-  - Get your Firefox profile folder (https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data)
-  - Copy your folder next to the bot.py
-  
+##### Heroku
+- Create a new application
+- Clone this project and add the heroku remote
+- Set the stack of your app to container `$ heroku stack:set container`
+- Configure your app environnement variable to add **HEROKU_APP_URL** (eg: *https://MY_APP.herokuapp.com/*)
+
+##### firefox_profile
+- Create a new Firefox profile (https://support.mozilla.org/en-US/kb/profile-manager-create-remove-switch-firefox-profiles?redirectlocale=en-US&redirectslug=profile-manager-create-and-remove-firefox-profiles)
+- Loggin to Bustabit with your new Firefox profile
+- Get your Firefox profile folder (https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data)
+- Copy your folder at the root project
+- Rename it **firefox_profile**
+
+> You could implemente a logging process with Selenium but Captcha makes it impossible
+> Firefox profile remove this logging process
+
+##### bustabit_script
+- Create a compatible bustabit autobet script (https://github.com/bustabit/autobet)
+- Copy your script at the root project
+- Rename it **bustabit_script.js**
 
 ### How to launch
-```sh
-$ python3 bot.py [firefox_folder]
-```
+Push all the files (Bustabot bot + firefox_profile + bustabit_script.js) to the heroku remote
