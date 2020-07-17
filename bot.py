@@ -81,7 +81,7 @@ class Bustabit:
         # Launch Firefox GUI in headless mode
         opt = webdriver.FirefoxOptions()
         opt.headless = True
-        self._webdriver = webdriver.Firefox(firefox_profile=profile_folder, firefox_options=opt)
+        self._webdriver = webdriver.Firefox(firefox_profile=profile_folder, options=opt)
         return
 
     def _connect(self):
