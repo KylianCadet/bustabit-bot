@@ -9,9 +9,10 @@ from selenium.webdriver.common.by import By
 import sys
 
 HOST = ''
-PORT = os.environ['PORT']
-URL = os.environ['HEROKU_APP_URL']
+PORT = 8080
 SIMULATION = False
+FIREFOX_DIR = "firefox_profile"
+SCRIPT_NAME = "bustabit_script.js"
 
 class MyHTTPHandler(BaseHTTPRequestHandler):
     """The request handler class for our server.
@@ -50,7 +51,7 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
 
 
 class Server:
-    """This class deserve the Heroku $PORT environnement variable
+    """This class deserve the PORT variable
     It must be instantiated only once
     """
 
@@ -138,12 +139,6 @@ class Bustabit:
 
     def _run(self):
         """Infinite loop"""
-        # Trick to keep this heroku app alive
-        # 60 * 1000 = 1 minute
-        self._webdriver.execute_script("""setInterval(function(){
-            fetch('""" + URL + """')
-        }, 60 * 1000 * 10)
-        """)
         s = Server(self._webdriver)
         s.run()
 
@@ -156,10 +151,6 @@ class Bustabit:
         self._auto_bet()
         self._run()
         return
-
-
-FIREFOX_DIR = "firefox_profile"
-SCRIPT_NAME = "bustabit_script.js"
 
 if __name__ == "__main__":
     if not os.path.isdir(FIREFOX_DIR):
