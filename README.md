@@ -1,5 +1,5 @@
 # Bustabit Bot
-This project aims to run the bustabit game (https://www.bustabit.com/) 24/7 on a single process
+This project aims to run the bustabit game (https://www.bustabit.com/) 24/7 in a docker container.
 
 ## How it works
 > Bustabit does not offer an API to work with, the best workaround is to simulate a web browser activity.
