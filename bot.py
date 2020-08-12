@@ -10,7 +10,8 @@ import sys
 
 HOST = ''
 PORT = 8080
-SIMULATION = False
+SIMULATION = True
+HEADLESS = True
 FIREFOX_DIR = "firefox_profile"
 SCRIPT_NAME = "bustabit_script.js"
 
@@ -24,9 +25,10 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
-        # Modify log container height to get more log
-        self.server.webdriver.execute_script("document.getElementsByClassName('logListContainer')[0].style.height = '400px'") # modify the height to have more log
-        log = self.server.webdriver.find_element_by_xpath("//div[@class='ReactVirtualized__Grid__innerScrollContainer']").text
+
+        # get log textarea text
+        self.server.webdriver.execute_script("document.getElementsByClassName('_1jjBnDK05lCAzmYgV4q7d7')[0].style.height = '800px'") # modify the height to have more log
+        log = self.server.webdriver.find_element_by_xpath("//div[@class='ReactVirtualized__Grid ReactVirtualized__List _3xAcZv1JrYCV_Ajd1Cp11h']").text
 
         # Open profile screen
         self.server.webdriver.find_element_by_xpath("//a[@href='/account/overview']").click()
@@ -34,15 +36,15 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         # Wait for the information table to show
         wait = ui.WebDriverWait(self.server.webdriver, 1)
         try:
-            wait.until(EC.presence_of_element_located((By.XPATH, "//table[@class='table-light table table-condensed table-hover']")))
+            wait.until(EC.presence_of_element_located((By.XPATH, "//table[@class='_1zLoOT7tI9HTWvoFSMtMUA _2pVOOBSgMNp3OXBpclwWYS table table-sm table-hover']")))
         except:
             self.wfile.write(b'error')
             return
 
         # Get usefull player informations
-        game_profit = self.server.webdriver.find_element_by_xpath("//table[@class='table-light table table-condensed table-hover']/tbody/tr[7]/td[2]").text
-        username = self.server.webdriver.find_element_by_xpath("//div[@class='account-header']/h3").text
-        balance = self.server.webdriver.find_element_by_xpath("//table[@class='table-light table table-condensed table-hover']/tbody/tr[8]/td[2]").text
+        game_profit = self.server.webdriver.find_element_by_xpath("//table[@class='_1zLoOT7tI9HTWvoFSMtMUA _2pVOOBSgMNp3OXBpclwWYS table table-sm table-hover']/tbody/tr[7]/td[2]").text
+        username = self.server.webdriver.find_element_by_xpath("//div[@class='_1QUsIcc0SPjOxwvm2IHPh-']/h3").text
+        balance = self.server.webdriver.find_element_by_xpath("//table[@class='_1zLoOT7tI9HTWvoFSMtMUA _2pVOOBSgMNp3OXBpclwWYS table table-sm table-hover']/tbody/tr[8]/td[2]").text
 
         # Close profile screen
         self.server.webdriver.find_element_by_xpath("//button[@class='close']").click()
@@ -81,7 +83,7 @@ class Bustabit:
 
         # Launch Firefox GUI in headless mode
         opt = webdriver.FirefoxOptions()
-        opt.headless = True
+        opt.headless = HEADLESS
         self._webdriver = webdriver.Firefox(firefox_profile=profile_folder, options=opt)
         return
 
@@ -93,7 +95,7 @@ class Bustabit:
         # Wait until we find the presence of the 'auto' button
         try:
             wait = ui.WebDriverWait(self._webdriver, 5)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//li[@class='' and @role='presentation']/a[@role='button' and @href='#']")))
+            wait.until(EC.presence_of_element_located((By.XPATH, "//a[@href='/account/overview']")))
         except:
             print('Are you sure you are logged with your profile ?')
             self._error = True
@@ -103,14 +105,14 @@ class Bustabit:
         """Starting auto bet with the user script (butabit_script.js)"""
 
         # Get and click on 'Auto' button
-        self._webdriver.find_element_by_xpath("//li[@class='' and @role='presentation']/a[@role='button' and @href='#']").click()
+        self._webdriver.find_element_by_xpath("//div[@class='bet-controls']/div/a[2]").click()
 
-        # Get and click on the eye button
-        self._webdriver.find_element_by_xpath("//button[@class='btn btn-xs btn-info']/i[@class='fa fa-eye']").click()
+        # Get and click on the 'New' button
+        self._webdriver.find_element_by_xpath("//button[@class='btn btn-success btn-xs btn btn-primary']").click()
         time.sleep(1) # Wait for the popup to dislay
 
         # Fill the text area with the user script
-        text_area = self._webdriver.find_element_by_xpath("//textarea[@class='form-control']")
+        text_area = self._webdriver.find_element_by_xpath("//textarea[@rows=8]")
         text_area.click()
         text_area.send_keys(Keys.CONTROL, 'a')
         text_area.send_keys(Keys.RETURN)
@@ -120,12 +122,12 @@ class Bustabit:
         self._webdriver.find_element_by_xpath("//button[@class='btn btn-success' and @type='submit']").click()
         time.sleep(1)
 
-        # Get and click on the 'Down arrow' button
-        self._webdriver.find_element_by_xpath("//button[@class='btn btn-xs btn-default']").click()
+        # Get and click on the 'Arrow' button
+        self._webdriver.find_element_by_xpath("//ul[@class='PynYN1mGJjFu9UXQGsHTQ']/li[6]/span/button[1]").click()
 
         if (SIMULATION):
             # Get and click on 'Simulation' checkbox
-            self._webdriver.find_element_by_xpath("//div[@class='checkbox simCheckbox']/label/input[@type='checkbox']").click()
+            self._webdriver.find_element_by_xpath("//input[@id='simulationModeCheck']").click()
 
             # Get and fill the 'simulated balance'
             SIMULATED_BALANCE = 100000
@@ -134,7 +136,8 @@ class Bustabit:
             simulated_balance_textbox.send_keys(str(SIMULATED_BALANCE))
 
         # Get and click on the 'Run script' button
-        self._webdriver.find_element_by_xpath("//button[@class='btn btn-success' and @type='submit']").click()
+        time.sleep(1)
+        self._webdriver.find_element_by_xpath("//button[@class='_14fFtlT1cpnw5CHIWeqBgY btn btn-success']").click()
         return
 
     def _run(self):
