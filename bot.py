@@ -1,7 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
 import time
-import pyperclip
 from selenium import webdriver
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.common.keys import Keys
@@ -11,7 +10,7 @@ import sys
 
 HOST = ''
 PORT = 8080
-SIMULATION = True
+SIMULATION = False
 HEADLESS = True
 FIREFOX_DIR = "firefox_profile"
 SCRIPT_NAME = "bustabit_script.js"
@@ -26,10 +25,8 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
-
-        # get log textarea text
+        # click on "Copy" (log) button
         self.server.webdriver.find_element_by_xpath("/html/body/div/div/div/div[5]/div/div[2]/div[2]/button").click()
-        log = pyperclip.paste()
 
         # Open profile screen
         self.server.webdriver.find_element_by_xpath("//a[@href='/account/overview']").click()
@@ -42,6 +39,19 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'error')
             return
 
+        # Create a textarea into the profile screen
+        self.server.webdriver.execute_script("""
+            var input = document.createElement('textarea');
+            input.id = 'my-textarea';
+            var body = document.getElementsByClassName('modal-content')[0]
+            body.appendChild(input);
+        """)
+
+        # get the textarea, paste the log and retreive its content
+        textarea = self.server.webdriver.find_element_by_xpath("//*[@id='my-textarea']")
+        textarea.send_keys(Keys.CONTROL + "v")
+        log = textarea.get_attribute("value")
+
         # Get usefull player informations
         game_profit = self.server.webdriver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]/div/div/div/div/table/tbody/tr[7]/td[2]").text
         username = self.server.webdriver.find_element_by_xpath("//header/div/h3").text
@@ -49,6 +59,8 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
 
         # Close profile screen
         self.server.webdriver.find_element_by_xpath("/html/body/div[3]/div/div/div[1]/button").click()
+
+        # Create and send response
         msg = 'Username : ' + username + '\nProfit : ' + game_profit + '\nBalance : ' + balance + '\n\n' + log
         self.wfile.write(bytes(msg, 'utf-8'))
 
