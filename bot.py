@@ -26,10 +26,10 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         # click on "Copy" (log) button
-        self.server.webdriver.find_element_by_xpath("/html/body/div/div/div/div[5]/div/div[2]/div[2]/button").click()
+        self.server.webdriver.find_element(By.XPATH, "/html/body/div/div/div/div[5]/div/div[2]/div[2]/button").click()
 
         # Open profile screen
-        self.server.webdriver.find_element_by_xpath("//a[@href='/account/overview']").click()
+        self.server.webdriver.find_element(By.XPATH, "//a[@href='/account/overview']").click()
 
         # Wait for the information table to show
         wait = ui.WebDriverWait(self.server.webdriver, 1)
@@ -48,17 +48,17 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
         """)
 
         # get the textarea, paste the log and retreive its content
-        textarea = self.server.webdriver.find_element_by_xpath("//*[@id='my-textarea']")
+        textarea = self.server.webdriver.find_element(By.XPATH, "//*[@id='my-textarea']")
         textarea.send_keys(Keys.CONTROL + "v")
         log = textarea.get_attribute("value")
 
         # Get usefull player informations
-        game_profit = self.server.webdriver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]/div/div/div/div/table/tbody/tr[7]/td[2]").text
-        username = self.server.webdriver.find_element_by_xpath("//header/div/h3").text
-        balance = self.server.webdriver.find_element_by_xpath("/html/body/div[3]/div/div/div[2]/div/div/div/div/table/tbody/tr[8]/td[2]").text
+        game_profit = self.server.webdriver.find_element(By.XPATH, "/html/body/div[3]/div/div/div[2]/div/div/div/div/table/tbody/tr[7]/td[2]").text
+        username = self.server.webdriver.find_element(By.XPATH, "//header/div/h3").text
+        balance = self.server.webdriver.find_element(By.XPATH, "/html/body/div[3]/div/div/div[2]/div/div/div/div/table/tbody/tr[8]/td[2]").text
 
         # Close profile screen
-        self.server.webdriver.find_element_by_xpath("/html/body/div[3]/div/div/div[1]/button").click()
+        self.server.webdriver.find_element(By.XPATH, "/html/body/div[3]/div/div/div[1]/button").click()
 
         # Create and send response
         msg = 'Username : ' + username + '\nProfit : ' + game_profit + '\nBalance : ' + balance + '\n\n' + log
@@ -97,9 +97,15 @@ class Bustabit:
         # Launch Firefox GUI in headless mode
         opt = webdriver.FirefoxOptions()
         opt.headless = HEADLESS
+        opt.binary_location = '/opt/firefox/firefox'
         if (opt.headless is False):
             print("Running in non headless mode !")
-        self._webdriver = webdriver.Firefox(firefox_profile=profile_folder, options=opt)
+        try:
+            self._webdriver = webdriver.Firefox(firefox_profile=profile_folder, options=opt)
+        except:
+            self._error = True
+            with open('./geckodriver.log', 'r') as log:
+                print(log.read())
         return
 
     def _connect(self):
@@ -120,39 +126,39 @@ class Bustabit:
         """Starting auto bet with the user script (butabit_script.js)"""
 
         # Get and click on 'Auto' button
-        self._webdriver.find_element_by_xpath("/html/body/div/div/div/div[5]/div/div[1]/a[2]").click()
+        self._webdriver.find_element(By.XPATH, "/html/body/div/div/div/div[5]/div/div[1]/a[2]").click()
 
         # Get and click on the 'New' button
-        self._webdriver.find_element_by_xpath("/html/body/div/div/div/div[5]/div/div[2]/div/div/button").click()
+        self._webdriver.find_element(By.XPATH, "/html/body/div/div/div/div[5]/div/div[2]/div/div/button").click()
         time.sleep(1) # Wait for the popup to dislay
 
         # Fill the text area with the user script
-        text_area = self._webdriver.find_element_by_xpath("//form/textarea")
+        text_area = self._webdriver.find_element(By.XPATH, "//form/textarea")
         text_area.click()
         text_area.send_keys(Keys.CONTROL, 'a')
         text_area.send_keys(Keys.RETURN)
         text_area.send_keys(self._script)
 
         # Get and click on the 'Create Script' button
-        self._webdriver.find_element_by_xpath("//form/div/button").click()
+        self._webdriver.find_element(By.XPATH, "//form/div/button").click()
         time.sleep(1)
 
         # Get and click on the 'Arrow' button
-        self._webdriver.find_element_by_xpath("//ul/li[6]/span/button[1]").click()
+        self._webdriver.find_element(By.XPATH, "//ul/li[6]/span/button[1]").click()
 
         if (SIMULATION):
             # Get and click on 'Simulation' checkbox
-            self._webdriver.find_element_by_xpath("//*[@id='simulationModeCheck']").click()
+            self._webdriver.find_element(By.XPATH, "//*[@id='simulationModeCheck']").click()
 
             # Get and fill the 'simulated balance'
             SIMULATED_BALANCE = 100000
-            simulated_balance_textbox = self._webdriver.find_element_by_name("simulatedBalance")
+            simulated_balance_textbox = self._webdriver.find_element(By.NAME, "simulatedBalance")
             simulated_balance_textbox.clear()
             simulated_balance_textbox.send_keys(str(SIMULATED_BALANCE))
 
         # Get and click on the 'Run script' button
         time.sleep(1)
-        self._webdriver.find_element_by_xpath("//form/button").click()
+        self._webdriver.find_element(By.XPATH, "//form/button").click()
         return
 
     def _run(self):
