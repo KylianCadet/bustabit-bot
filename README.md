@@ -24,16 +24,14 @@ Bustabit bot is simulating the creation of an auto bet script and launch it.
 - Rename it **bustabit_script.js**
 
 ### docker-compose
-- [Install docker and docker-compose](https://docs.docker.com/compose/install/)
-
-> The easiest way is to install it with `pip`
+- [Install docker engine with the docker compose plugin](https://docs.docker.com/engine/install/)
 
 ## How to launch
-`docker-compose up -d`
+`docker compose up -d`
 
 After this you can browse at **localhost:8000** to see some usefull informations about your butsabit account and some of your script logs
 
 > You can modify the port number in docker-compose.yml
 
 ## How to stop
-`docker-compose down`
+`docker compose down`
